@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+<!--    自动扫描，后面的属性是需要扫描的包路径-->
+    <context:component-scan base-package="com.haina.spring"/>
+<!--   用来加载自定义的配置文件，加载到spring的空间中，我们在程序里可以通过注解使用该配置文件中的数据 -->
+    <context:property-placeholder location="classpath:db.properties"/>
+
+
+
+
+
+
+<!--    配置aop自动代理处理方式 -->
+    <aop:aspectj-autoproxy/>
+<!--    给我们自定义的aop切面类创建出相应的bean，交给spring管理-->
+    <bean id="aopAspect" class ="com.haina.spring.aop.AopAspect"/>
+
+<!--    用来配置我们要给那个类的哪写方法增加aop切面-->
+    <aop:config>
+<!--        使用表达式来匹配我么需要增加切面方法，pointcut是一个切点，通用改切点使用得表达式可以找到匹配得方法-->
+<!--                                                    给公共得方法增加-->
+<!--                                                    限制publi int类型的-->
+        <aop:pointcut id="cal" expression="execution(public * com.haina.spring.aop.CalculatorImpl.*(..))"/>
+        <aop:aspect ref="aopAspect" order="4">
+<!--            通过cal这个切点找到得方法，在执行前需要调用aopAspect对象中得before方法-->
+<!--           pointcut-ref属性用来配置 需要使用得切点得bean method属性用来配置需要调用切面得那个方法-->
+<!--            动态代理模式-->
+            <aop:before method="before" pointcut-ref="cal"/>
+<!--            在方法运行之后执行after方法,即使方法出现了异常，这个逻辑仍然会执行-->
+            <aop:after method="after" pointcut-ref="cal"/>
+<!--            after-returing 在运行成功之后才会执行，如果出现异常则不会执行，后面得也不会执行 ,result参数-->
+            <aop:after-returning method="afterRet" pointcut-ref="cal" returning="result"/>
+<!--        只有在方法出现异常得时候才会，触发这个通知，后面得不会执行-->
+            <aop:after-throwing method="afterException" pointcut-ref="cal"/>
+
+<!--            可以在方法执行前执行后分别加上-->
+            <aop:around method="round" pointcut-ref="cal"/>
+
+        </aop:aspect>
+    </aop:config>
+
+
+
+
+
+
+
+
+
+
+<!--    bean 相当于我们的一个java对象
+        通过bean标签让spring帮我们创建对象 -->
+    <bean id="hello" class="com.haina.spring.HelloWorld"/>
+
+<!--    创建helloword 对象，并给类中得msg属性赋值-->
+    <bean id="hw" class="com.haina.spring.HelloWorld">
+        <property name="msg" value=" xml msg"/>
+    </bean>
+
+<!--    构造器注入-->
+    <bean id="hw2" class="com.haina.spring.HelloWorld">
+<!--        通过构造器创建对象，name是构造方法得参数名，value是给参数赋的值-->
+<!--        1）普通构造器-->
+<!--        <constructor-arg name="msg" value=" constructor msg"/>-->
+
+<!--        2）下标构造器-, 通过下标注入，位置从0开始，如果构造方法 有多个参数，就写多个constructor-arg标签，然后写对应下标即可 -->
+        <constructor-arg index="0" value=" index msg"/>
+        <!--       <> 特殊符号会报错   -->
+<!--        <constructor-arg index="1" value=" bbbbbbbbb"/>-->
+<!--        使用<![CDATA[XXX]]> 的方式，可以在字符串里写特殊字符 -->
+        <constructor-arg index="1">
+            <value><![CDATA[bbb<bbb]]></value>
+        </constructor-arg>
+    </bean>
+
+
+
+<!--   set 构造方法，放入张三  -->
+    <bean id="person" class="com.haina.spring.Person">
+        <property name="name" value="张三"/>
+    </bean>
+    <bean id="helloPerson" class="com.haina.spring.HelloWorld">
+<!--        当我们把引用类型的对象赋值给属性是，需要ref-->
+<!--        p.getName()  的得到张三  -->
+        <property name="p" ref="person"/>
+    </bean>
+
+<!-- 属性自动装配，会自动的把上面定义好的person类型的bean，装配到该bean的person类型属性中
+        person 是 helloword类里卖弄的一个属性
+    -->
+<!--    <bean id="helloAuto" class="com.haina.spring.HelloWorld" autowire="byType"/>-->
+
+    <!--    根据名称自动装配 bean 的名字要与被装配的属性名相同，否则无法自动装配-->
+    <bean id="p" class="com.haina.spring.Person">
+        <property name="name" value="abc"/>
+    </bean>
+    <bean id="helloAuto" class="com.haina.spring.HelloWorld" autowire="byName"/>
+
+<!--    使用spring帮我们创建一个jdk自带的date类型对象-->
+    <bean id="date" class="java.util.Date"/>
+</beans>

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.haina.mybatis.dao.CityDao">
+
+    <resultMap id="resultMap1" type="com.haina.mybatis.model.City">
+        <id column="id" property="id"/>
+        <!--     column代表的是数据库中的字段名，  property代表的是类中的属性名   -->
+        <result column="name" property="name"/>
+        <!--    因为country属性不是基本数据类型或者字符串类型， 而是我们自己顶一个的一个引用类型的属性
+                该类型里有两个属性，id和name， 我们需要使用association标签来对该类型的属性进行赋值
+            -->
+        <association property="country" javaType="com.haina.mybatis.model.Country">
+<!--            country_name  别名-->
+            <id column="country_id" property="id"/>
+            <result column="country_name" property="name"/>
+        </association>
+    </resultMap>
+
+    <select id="getCityById1" resultMap="resultMap1">
+        select c1.id, c1.name, c2.id country_id, c2.name country_name
+        from city c1, country c2 where c2.id=c1.cid and c1.id=#{id}
+    </select>
+
+    <resultMap id="resultMap2" type="com.haina.mybatis.model.City">
+        <id column="id" property="id"/>
+        <!--     column代表的是数据库中的字段名，  property代表的是类中的属性名   -->
+        <result column="name" property="name"/>
+        <!--    因为country属性不是基本数据类型或者字符串类型， 而是我们自己顶一个的一个引用类型的属性
+                该类型里有两个属性，id和name， 我们需要使用association标签来对该类型的属性进行赋值
+            -->
+        <association property="country" javaType="com.haina.mybatis.model.Country"
+            select="com.haina.mybatis.dao.CountryDao.getCountryById"
+            column="cid"/>
+
+    </resultMap>
+<!--    查询两次数据库 -->
+    <select id="getCityById2" resultMap="resultMap2">
+        select * from city where id=#{id};
+    </select>
+</mapper>

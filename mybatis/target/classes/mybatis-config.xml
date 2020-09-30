@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+
+<!--    要加载数据库的资源文件，然后在数据库的连接池的配置中可以使用-->
+    <properties resource="db.properties"/>
+
+
+    <settings>
+        <!--     开启缓存   -->
+        <setting name="cacheEnabled" value="true"/>
+<!--    支持驼峰式命名规范，数据库里面式first_name,而User中式firstName 驼峰形式-->
+        <setting name="mapUnderscoreToCamelCase" value="true"/>
+<!--        日志-->
+        <setting name="logImpl" value="STDOUT_LOGGING"/>
+    </settings>
+
+<!--    给User全类名，起一个别名,方便我们使用，别名不区分大小写-->
+    <typeAliases>
+        <typeAlias type="com.haina.mybatis.model.User" alias="user"/>
+<!--        该包下的所有类的别名，都是类名-->
+<!--        <package name="com.haina.mybatis.model"/>-->
+<!--        以上这两条不能混着用，只能用一个，要不就乱套了-->
+    </typeAliases>
+
+    <environments default="dev">
+        <environment id="dev">
+            <transactionManager type="JDBC"></transactionManager>
+
+            <dataSource type="POOLED">
+                <property name="driver" value="${driver}"/>
+                <property name="url" value="${url}"/>
+                <property name="username" value="${dbuser}"/>
+                <property name="password" value="${dbpassword}"/>
+            </dataSource>
+        </environment>
+    </environments>
+
+<!--    告诉mybatis 要加载得xml得路径在哪-->
+    <mappers>
+        <mapper resource="mapper/UserMapper.xml"/>
+    <!--    告诉mybatis 要加载得xml得路径在哪-->
+        <mapper resource="mapper/CityMapper.xml"/>
+        <mapper resource="mapper/CountryMapper.xml"/>
+    </mappers>
+
+</configuration>

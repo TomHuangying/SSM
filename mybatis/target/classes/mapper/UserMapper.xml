@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!-- namespace：该mapper映射文件的 唯一标识符    -->
+<mapper namespace="com.haina.mybatis.dao.UserDao">
+<!--处理数据库中字段名 与java类中属性名不一致的情况的一个映射关联 -->
+    <resultMap id="BaseResultMap" type="com.haina.mybatis.model.User">
+<!--        主键用id标签 -->
+        <id column="id" property="id"/>
+        <result column="name" property="name"/>
+        <result column="age" property="age"/>
+        <result column="first_name" property="firstName"/>
+    </resultMap>
+
+    <cache>
+        <property name="eviction" value="LRU"/>
+<!--        缓存刷新 10秒-->
+        <property name="flushInterval" value="10"/>
+<!--        大小-->
+        <property name="size" value="10"/>
+    </cache>
+
+
+<!--    select标签代表这是一条查询方法得sql语句-->
+<!--    id值要与我们接口中对应得方法名意指，要不然几找不到对应得方法
+        resultType是该方法的返回值类型-->
+<!--                        resultType有返回值就需要写-->
+<!--            表示这个方法要使用缓存 加useCache="true"-->
+<!--   resultMap是该方法返回值类型的映射关系 -->
+    <select id="selectById" resultMap="BaseResultMap" useCache="true">
+        select*from user where id = #{id}
+    </select>
+
+    <update id="updateUser">
+        update user set name=#{name}, age=#{age} where id=#{id}
+    </update>
+
+    <insert id="insertUser">
+        insert into user(name,age,first_name) values(#{name},#{age},#{firstName})
+    </insert>
+
+    <delete id="deleteUser">
+        delete from user where id=#{id}
+    </delete>
+
+    <select id="selectByNameAndAge" resultType="user">
+    <!-- 当前方法有多个参数的时候，我们可以使用param1 param2 ..来代表对应位置的参数 -->
+        select *from user where name=#{param1} and age=#{param2}
+    </select>
+
+    <select id="selectByNameAndAge2" resultType="user">
+        select *from user where name=#{name} and age=#{age}
+    </select>
+
+
+
+
+
+
+
+
+
+
+</mapper>
+
+
+
+
+
+
+
+
+
